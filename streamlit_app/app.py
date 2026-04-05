@@ -119,7 +119,8 @@ def run_query(sql_query):
         return df.apply(pd.to_numeric, errors='ignore')
     else:
         # raise Exception(f"State: {state} | Full response: {data}")
-        raise Exception(f"State: {state} | Error code: {data.get('status', {}).get('error', {}).get('error_code')} | Message: {data.get('status', {}).get('error', {}).get('message')}")
+        # raise Exception(f"State: {state} | Error code: {data.get('status', {}).get('error', {}).get('error_code')} | Message: {data.get('status', {}).get('error', {}).get('message')}")
+        raise Exception(f"Full response: {json.dumps(data, indent=2)}")
 
 def validate_sql(sql):
     blocked = ['DROP', 'DELETE', 'ALTER', 'TRUNCATE', 'INSERT', 'UPDATE', 'CREATE', 'REPLACE']
