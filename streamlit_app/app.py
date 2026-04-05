@@ -98,13 +98,18 @@ def generate_sql(question):
 def run_query(sql_query):
     url = f"https://{DATABRICKS_HOST}/api/2.0/sql/statements"
     headers = {"Authorization": f"Bearer {DATABRICKS_TOKEN}", "Content-Type": "application/json"}
+    # payload = {
+    #     "warehouse_id": WAREHOUSE_ID,
+    #     "statement": sql_query,
+    #     "wait_timeout": "50s",
+    #     "disposition": "INLINE",
+    #     "format": "JSON_ARRAY"
+    # }
     payload = {
         "warehouse_id": WAREHOUSE_ID,
         "statement": sql_query,
-        "wait_timeout": "50s",
-        "disposition": "INLINE",
-        "format": "JSON_ARRAY"
-    }
+        "wait_timeout": "50s"
+}
     
     response = requests.post(url, headers=headers, json=payload)
     data = response.json()
