@@ -179,12 +179,17 @@ if question:
 
         if not df.empty:
             st.subheader("Results")
-            format_dict = {}
-            for col, fmt_type in formats.items():
-                fmt = FORMAT_MAP.get(fmt_type)
-                if fmt:
-                    format_dict[col] = fmt
-            st.dataframe(df.style.format(format_dict), use_container_width=True)
+            try:
+                format_dict = {}
+                for col, fmt_type in formats.items():
+                    if col in df.columns:
+                        fmt = FORMAT_MAP.get(fmt_type)
+                        if fmt:
+                            format_dict[col] = fmt
+                st.dataframe(df.style.format(format_dict), use_container_width=True)
+            except Exception:
+                st.dataframe(df, use_container_width=True)
+
             # Auto chart
             numeric_cols = df.select_dtypes(include='number').columns.tolist()
             categorical_cols = df.select_dtypes(exclude='number').columns.tolist()
