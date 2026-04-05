@@ -159,7 +159,7 @@ FORMAT_MAP = {
     "integer": "{:,}",
     "decimal": "{:,.2f}",
     "percent": "{:,.1f}%",
-    # "id": "{:,}",
+    "id": "{}",
     "text": None
 }
 
