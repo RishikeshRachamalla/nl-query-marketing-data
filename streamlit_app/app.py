@@ -164,21 +164,9 @@ FORMAT_MAP = {
 }
 
 if question:
-    # Debug: test Databricks connection
-    try:
-        test_url = f"https://{DATABRICKS_HOST}/api/2.0/sql/statements"
-        test_headers = {"Authorization": f"Bearer {DATABRICKS_TOKEN}", "Content-Type": "application/json"}
-        test_payload = {"warehouse_id": WAREHOUSE_ID, "statement": "SELECT 1", "wait_timeout": "30s"}
-        test_response = requests.post(test_url, headers=test_headers, json=test_payload)
-        st.write("Connection test status code:", test_response.status_code)
-        st.write("Connection test response:", test_response.json())
-    except Exception as e:
-        st.write("Connection test failed:", str(e))
-
     with st.spinner("Generating SQL..."):
         sql_query, formats = generate_sql(question)
 
-    # Guardrail check
     try:
         validate_sql(sql_query)
     except Exception as e:
@@ -186,7 +174,6 @@ if question:
         st.stop()
 
     st.subheader("Generated SQL")
-    # st.code(sql_query, language="sql")
     st.code(sql_query, language="sql", wrap_lines=True)
 
     try:
@@ -195,30 +182,10 @@ if question:
 
         if not df.empty:
             st.subheader("Results")
-            try:
-                format_dict = {}
-                for col, fmt_type in formats.items():
-                    if col in df.columns:
-                        fmt = FORMAT_MAP.get(fmt_type)
-                        if fmt:
-                            format_dict[col] = fmt
-                st.dataframe(df.style.format(format_dict), use_container_width=True)
-            except Exception:
-                st.dataframe(df, use_container_width=True)
-
-            # Auto chart
-            numeric_cols = df.select_dtypes(include='number').columns.tolist()
-            categorical_cols = df.select_dtypes(exclude='number').columns.tolist()
-
-            if len(numeric_cols) >= 1 and len(categorical_cols) >= 1:
-                st.subheader("Chart")
-                chart_col = st.selectbox("Select metric to chart:", numeric_cols)
-                st.bar_chart(df.set_index(categorical_cols[0])[chart_col])
-            elif len(numeric_cols) >= 2:
-                st.subheader("Chart")
-                st.line_chart(df.set_index(df.columns[0])[numeric_cols[1:]])
+            st.dataframe(df, use_container_width=True)
         else:
             st.info("Query returned no results.")
 
     except Exception as e:
         st.error(f"Query failed: {str(e)}")
+        st.write("Error type:", type(e).__name__)
