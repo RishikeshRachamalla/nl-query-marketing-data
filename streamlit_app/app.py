@@ -101,7 +101,9 @@ def run_query(sql_query):
     payload = {
         "warehouse_id": WAREHOUSE_ID,
         "statement": sql_query,
-        "wait_timeout": "30s"
+        "wait_timeout": "50s",
+        "disposition": "INLINE",
+        "format": "JSON_ARRAY"
     }
     
     response = requests.post(url, headers=headers, json=payload)
