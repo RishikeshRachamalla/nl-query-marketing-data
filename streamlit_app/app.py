@@ -164,6 +164,18 @@ FORMAT_MAP = {
 }
 
 if question:
+    if question:
+    # Debug: test Databricks connection
+    try:
+        test_url = f"https://{DATABRICKS_HOST}/api/2.0/sql/statements"
+        test_headers = {"Authorization": f"Bearer {DATABRICKS_TOKEN}", "Content-Type": "application/json"}
+        test_payload = {"warehouse_id": WAREHOUSE_ID, "statement": "SELECT 1", "wait_timeout": "30s"}
+        test_response = requests.post(test_url, headers=test_headers, json=test_payload)
+        st.write("Connection test status code:", test_response.status_code)
+        st.write("Connection test response:", test_response.json())
+    except Exception as e:
+        st.write("Connection test failed:", str(e))
+        
     with st.spinner("Generating SQL..."):
         sql_query, formats = generate_sql(question)
 
