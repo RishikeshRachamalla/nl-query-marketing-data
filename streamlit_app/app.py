@@ -123,7 +123,13 @@ def run_query(sql_query):
         # df = pd.DataFrame(data["result"]["data_array"], columns=columns)
         rows = data.get("result", {}).get("data_array", [])
         df = pd.DataFrame(rows, columns=columns)
-        return df.apply(pd.to_numeric, errors='ignore')
+        # return df.apply(pd.to_numeric, errors='ignore')
+        for col in df.columns:
+            try:
+                df[col] = pd.to_numeric(df[col])
+            except (ValueError, TypeError):
+                pass
+        return df
     else:
         # raise Exception(f"State: {state} | Full response: {data}")
         # raise Exception(f"State: {state} | Error code: {data.get('status', {}).get('error', {}).get('error_code')} | Message: {data.get('status', {}).get('error', {}).get('message')}")
