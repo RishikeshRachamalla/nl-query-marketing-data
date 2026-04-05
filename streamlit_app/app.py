@@ -164,7 +164,6 @@ FORMAT_MAP = {
 }
 
 if question:
-    if question:
     # Debug: test Databricks connection
     try:
         test_url = f"https://{DATABRICKS_HOST}/api/2.0/sql/statements"
@@ -175,7 +174,7 @@ if question:
         st.write("Connection test response:", test_response.json())
     except Exception as e:
         st.write("Connection test failed:", str(e))
-        
+
     with st.spinner("Generating SQL..."):
         sql_query, formats = generate_sql(question)
 
