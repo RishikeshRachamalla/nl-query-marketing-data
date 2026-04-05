@@ -110,6 +110,8 @@ def run_query(sql_query):
     data = response.json()
     
     state = data.get("status", {}).get("state", "UNKNOWN")
+    if state != "SUCCEEDED":
+        st.write("DEBUG RESPONSE:", data)
     
     if state == "SUCCEEDED":
         columns = [col["name"] for col in data["manifest"]["schema"]["columns"]]
