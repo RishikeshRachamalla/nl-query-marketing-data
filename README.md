@@ -1,131 +1,110 @@
-# Data Play — AI-Powered NL Query Layer for Marketing Analytics
+# 🎯 Data Play — Ask Your Marketing Data Anything
 
-**Author:** Rishikesh Rachamalla
-**Stack:** Databricks · Delta Lake · PySpark · Claude API · Streamlit · Python
+<p align="center">
+  <img src="https://img.shields.io/badge/Databricks-FF3621?style=for-the-badge&logo=databricks&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Delta_Lake-003366?style=for-the-badge&logo=apachespark&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Claude_API-8A2BE2?style=for-the-badge&logo=anthropic&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Python_3.11-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
+</p>
 
----
-
-## What This Is
-
-An end-to-end data pipeline and AI application that takes raw retail transaction data (UCI Online Retail II, 525K rows) through a Medallion architecture on Databricks, then exposes the Gold layer through a **natural-language query interface** powered by the Claude API.
-
-**Ask in plain English → Claude generates SQL → Databricks runs it → Results + AI Insight.**
-
----
-
-## Live Demo
-
-> Ask: *"Platinum customers with high churn risk"*
-> Ask: *"Which signup channel drives the most revenue?"*
-> Ask: *"Compare avg basket size across loyalty tiers"*
+<p align="center">
+  <strong>Type a question. Get SQL. See results. Understand the story.</strong><br/>
+  A natural-language analytics interface built on a full Medallion pipeline — 525K retail rows, Gold tables, and Claude AI.
+</p>
 
 ---
 
-## Project Structure
+## ✨ What It Does
+
+**Data Play** turns plain English questions into live Databricks SQL queries — no SQL knowledge needed.
 
 ```
-nl-query-marketing-data/
-├── enrichment/
-│   ├── enrich_retail_data.py        # Phase 1: UCI dataset enrichment script
-│   └── output/                      # Generated CSVs (gitignored)
-│
-├── notebooks/
-│   ├── 01_bronze_ingestion.py       # Databricks: Bronze table verification
-│   ├── 02_silver_transformation.py  # Databricks: Silver layer queries
-│   ├── 03_gold_aggregation.py       # Databricks: Gold layer aggregations
-│   └── 04_data_quality_checks.py   # Databricks: DQ checks
-│
-├── streamlit_app/
-│   ├── app.py                       # Main UI — page layout, rendering, query flow
-│   └── utils/
-│       ├── config.py                # Constants, schema definitions, format maps
-│       ├── llm.py                   # Claude API — SQL generation + AI insights
-│       ├── database.py              # Databricks SQL Warehouse query execution
-│       ├── guardrails.py            # Input validation, SQL safety, cooldown
-│       └── helpers.py              # Formatting, history, UI components
-│
-├── docs/
-│   ├── architecture.md              # System design — 5-phase architecture
-│   └── data_dictionary.md          # All column definitions
-│
-├── requirements.txt
-├── .gitignore
-└── README.md
+You type:   "Which signup channel drives the most revenue?"
+Claude:      SELECT signup_channel, SUM(total_revenue) ...
+Databricks:  Executes against 525K row Gold table
+You see:     Table + chart + AI business insight + follow-up ideas
 ```
+
+Built end-to-end: raw CSV → Medallion architecture (Bronze → Silver → Gold) → served via Databricks SQL Warehouse → queried through a Streamlit app powered by Claude API.
 
 ---
 
-## Architecture — 5 Phases
+## 🏗️ Architecture
 
 ```
-Phase 1: Data Ingestion
-  UCI Online Retail II (525K rows CSV)
-  → Databricks DBFS (raw file storage)
-  → Python + Faker (enrich loyalty fields)
-
-Phase 2: Medallion Architecture (PySpark + Delta Lake)
-  Bronze → Silver → Gold
-  Raw transactions → Deduped + enriched → Aggregated tables
-
-Phase 3: Gold Tables (Delta Lake)
-  customer_360 · daily_kpis · segment_summary · campaign_metrics
-
-Phase 4: Serving Layer
-  Databricks SQL Warehouse (Serverless)
-
-Phase 5: AI Query Layer (Streamlit App)
-  User NL question → Claude API (Schema + NL → SQL)
-  → Databricks SQL → Results + Chart + AI Insight
+┌─────────────────────────────────────────────────────────────────┐
+│                     DATA PIPELINE (Databricks)                  │
+│                                                                 │
+│  UCI Online Retail II   →   Bronze Layer   →   Silver Layer    │
+│     525K transactions        (raw Delta)      (cleaned, RFM,   │
+│     + Faker enrichment                         loyalty scores)  │
+│                                                                 │
+│                         Silver Layer   →   Gold Layer          │
+│                                           customer_360          │
+│                                           daily_kpis            │
+│                                           segment_summary       │
+│                                           campaign_metrics      │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                    Databricks SQL Warehouse
+                             │
+┌────────────────────────────▼────────────────────────────────────┐
+│                     AI QUERY LAYER (Streamlit)                  │
+│                                                                 │
+│   User question  →  Claude API (NL → SQL)  →  Databricks SQL  │
+│                  ←  Results + KPIs + Chart                      │
+│                  ←  AI Insight + 3 Follow-up Questions          │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Gold Tables
+## 🗂️ Gold Tables
 
-| Table | Rows | Description |
+| Table | Rows | What's Inside |
 |---|---|---|
-| `customer_360` | ~4,372 | Full customer profile — RFM, loyalty tier, demographics, churn risk |
-| `daily_kpis` | ~750 | Daily revenue, transactions, active customers |
-| `segment_summary` | 4 | Aggregated metrics by loyalty tier |
-| `campaign_metrics` | ~6 | Performance by signup channel |
-
-**Dataset range:** December 2009 – December 2011
+| `customer_360` | ~4,372 | Full customer profile — RFM scores, loyalty tier, demographics, churn risk, basket size |
+| `daily_kpis` | ~750 | Daily revenue, transaction count, active customers (Dec 2009 – Dec 2011) |
+| `segment_summary` | 4 | Revenue, AOV, frequency aggregated by loyalty tier (Bronze / Silver / Gold / Platinum) |
+| `campaign_metrics` | ~6 | Acquisition channel performance — email opt-in rates, revenue per channel |
 
 ---
 
-## Streamlit App Features
+## 🎨 App Features
 
-### Core
-- Natural language → SQL via Claude API (schema-aware prompting)
-- Databricks SQL Warehouse execution
-- Results table with formatted columns (currency, %, integers)
-- Auto-fit bar/line charts
-- CSV download
+### 🤖 AI Query Layer
+- **Natural language → SQL** — Schema-aware Claude prompt generates precise, safe SQL
+- **AI Insight card** — Every result gets a 2-3 sentence analyst-style business interpretation
+- **Smart follow-ups** — 3 context-aware follow-up questions generated per query, one-click to run
 
-### AI Layer
-- **AI Insight** — Claude generates a 2-3 sentence analyst-style business insight from every result
-- **Follow-up questions** — 3 smart follow-up questions generated per query, clickable to re-run
+### 🛡️ 6-Layer Guardrail System
 
-### Guardrails (6 layers)
-| # | Guardrail | What it prevents |
+| Layer | Guard | Protects Against |
 |---|---|---|
-| 1 | Query cooldown (3s) | Warehouse overload |
-| 2 | Input validation | Too short, too long, gibberish |
-| 3 | Prompt injection detection | AI manipulation attempts |
+| 1 | Query cooldown (3s) | Warehouse hammering |
+| 2 | Input validation | Too short / too long / gibberish inputs |
+| 3 | Prompt injection detection | AI jailbreak / manipulation attempts |
 | 4 | Out-of-scope detection | Weather, sports, unrelated questions |
-| 5 | Destructive SQL blocking | DROP, DELETE, ALTER, TRUNCATE |
-| 6 | SELECT * guard + LIMIT enforcement | Full table scans on 500K+ row tables |
+| 5 | Destructive SQL blocking | `DROP`, `DELETE`, `ALTER`, `TRUNCATE` |
+| 6 | `SELECT *` guard + auto-`LIMIT` | Full table scans on 500K+ row tables |
 
-### UX
+### 📊 Data Presentation
+- Formatted columns — currency (`$1,234`), percentages (`87.3%`), integers
+- Auto-sized bar/line charts per result shape
+- KPI summary row (smart avg vs. sum based on column type)
+- One-click CSV download
+
+### 🧭 UX
 - Dark animated gradient UI
-- Schema explorer sidebar with column type badges
-- Query history (last 10 queries)
-- Compact hero when query is active
-- `.env` validation on startup with clear error messaging
+- Schema explorer sidebar — all 4 tables with column types
+- Query history (last 10 queries, no duplicates)
+- Compact hero mode once a query is active
+- `.env` health check on startup with actionable error messages
 
 ---
 
-## Quick Start
+## 🚀 Quick Start
 
 ### 1. Clone & install
 
@@ -134,37 +113,45 @@ git clone https://github.com/RishikeshRachamalla/nl-query-marketing-data.git
 cd nl-query-marketing-data
 
 python3 -m venv venv
-source venv/bin/activate
+source venv/bin/activate       # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Set up environment variables
+### 2. Configure environment
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env`:
-```
-ANTHROPIC_API_KEY=your_claude_api_key
+Fill in `.env`:
+
+```env
+ANTHROPIC_API_KEY=sk-ant-...
 DATABRICKS_HOST=your-workspace.azuredatabricks.net
 DATABRICKS_HTTP_PATH=/sql/1.0/warehouses/your_warehouse_id
-DATABRICKS_TOKEN=your_databricks_token
+DATABRICKS_TOKEN=dapiXXXXXXXXXXXXXXXX
 ```
 
-### 3. Phase 1 — Data ingestion
+### 3. Build the data pipeline (Databricks)
 
 ```bash
-# Download UCI Online Retail II from Kaggle:
-# https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci
-# Place the file in enrichment/
+# 1. Download UCI Online Retail II from Kaggle:
+#    https://www.kaggle.com/datasets/mashlyn/online-retail-ii-uci
+#    Place the .xlsx file in enrichment/
 
+# 2. Enrich the dataset locally
 cd enrichment/
 python enrich_retail_data.py
 
-# Upload output CSVs to Databricks via UI:
-# enrichment/output/bronze_raw_transactions.csv   → default.bronze_raw_transactions
-# enrichment/output/silver_enriched_customers.csv → default.silver_enriched_customers
+# 3. Upload output CSVs to Databricks DBFS via the UI
+#    enrichment/output/bronze_raw_transactions.csv   → default.bronze_raw_transactions
+#    enrichment/output/silver_enriched_customers.csv → default.silver_enriched_customers
+
+# 4. Run notebooks in order (Databricks workspace):
+#    notebooks/01_bronze_ingestion.py
+#    notebooks/02_silver_transformation.py
+#    notebooks/03_gold_aggregation.py
+#    notebooks/04_data_quality_checks.py
 ```
 
 ### 4. Run the app
@@ -174,55 +161,88 @@ cd streamlit_app/
 streamlit run app.py
 ```
 
+Open `http://localhost:8501` — start asking questions.
+
 ---
 
-## Environment Variables
+## 💬 Example Questions to Try
 
-| Variable | Description |
+```
+Top 10 customers by total spend
+Which signup channel drives the most revenue?
+Platinum customers with high churn risk
+Email opt-in rate by age group
+Compare avg basket size across loyalty tiers
+Show daily revenue trend for 2011
+```
+
+---
+
+## 📁 Project Structure
+
+```
+nl-query-marketing-data/
+├── enrichment/
+│   ├── enrich_retail_data.py        # Phase 1: UCI dataset enrichment + Faker fields
+│   └── output/                      # Generated CSVs (gitignored)
+│
+├── notebooks/
+│   ├── 01_bronze_ingestion.py       # Databricks: Bronze Delta table
+│   ├── 02_silver_transformation.py  # Databricks: Clean, join, RFM scores
+│   ├── 03_gold_aggregation.py       # Databricks: Build 4 Gold tables
+│   └── 04_data_quality_checks.py   # Databricks: Row counts, null checks
+│
+├── streamlit_app/
+│   ├── app.py                       # UI layout, page rendering, query orchestration
+│   └── utils/
+│       ├── config.py                # Constants, schema, format maps, guardrail patterns
+│       ├── llm.py                   # Claude API — SQL generation + AI insights
+│       ├── database.py              # Databricks SQL Warehouse query execution
+│       ├── guardrails.py            # Input validation, SQL safety, rate limiting
+│       └── helpers.py              # Formatting, query history, UI components
+│
+├── requirements.txt
+├── .env.example
+└── README.md
+```
+
+---
+
+## 🔧 Environment Variables
+
+| Variable | Where to get it |
 |---|---|
-| `ANTHROPIC_API_KEY` | Claude API key from console.anthropic.com |
-| `DATABRICKS_HOST` | Databricks workspace hostname (no https://) |
-| `DATABRICKS_HTTP_PATH` | SQL Warehouse HTTP path |
-| `DATABRICKS_TOKEN` | Databricks personal access token |
+| `ANTHROPIC_API_KEY` | [console.anthropic.com](https://console.anthropic.com) |
+| `DATABRICKS_HOST` | Databricks workspace URL (no `https://`) |
+| `DATABRICKS_HTTP_PATH` | SQL Warehouse → Connection Details → HTTP Path |
+| `DATABRICKS_TOKEN` | Databricks → User Settings → Access Tokens |
 
 ---
 
-## Code Structure
+## ✅ Build Status
 
-| File | Responsibility |
-|---|---|
-| `app.py` | UI layout, page rendering, query orchestration |
-| `utils/config.py` | All constants, schema definitions, format maps, guardrail patterns |
-| `utils/llm.py` | `generate_sql()` and `generate_insight()` — Claude API calls |
-| `utils/database.py` | `run_query()` — Databricks REST API execution |
-| `utils/guardrails.py` | `check_input()`, `validate_sql()`, `enforce_limit()`, `is_on_cooldown()` |
-| `utils/helpers.py` | `format_dataframe()`, `add_to_history()`, `guardrail_card()` |
-
----
-
-## Phase Status
-
-| Phase | Description | Status |
+| Phase | What Was Built | Status |
 |---|---|---|
-| 1 | Data ingestion — enrich UCI dataset, upload to Databricks | ✅ Complete |
-| 2 | Silver layer — clean, join, compute RFM scores | ✅ Complete |
-| 3 | Gold layer — customer_360, daily_kpis, segments, campaigns | ✅ Complete |
-| 4 | Serving layer — Databricks SQL Warehouse | ✅ Complete |
-| 5 | AI query layer — Claude API + Streamlit app | ✅ Complete |
+| 1 | UCI data ingestion, Faker enrichment, DBFS upload | ✅ Done |
+| 2 | Silver layer — dedup, joins, RFM computation | ✅ Done |
+| 3 | Gold layer — 4 aggregated Delta tables | ✅ Done |
+| 4 | Databricks SQL Warehouse (serverless) | ✅ Done |
+| 5 | Streamlit AI query layer with Claude API | ✅ Done |
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Data storage | Databricks DBFS + Delta Lake |
-| Data processing | PySpark (Medallion architecture) |
-| Serving | Databricks SQL Warehouse (Serverless) |
-| AI / LLM | Anthropic Claude API (claude-haiku-4-5) |
+| Raw storage | Databricks DBFS |
+| Data format | Delta Lake (ACID transactions, time travel) |
+| Processing | PySpark (Medallion architecture) |
+| Serving | Databricks SQL Warehouse — Serverless |
+| LLM | Anthropic Claude API (`claude-haiku-4-5`) |
 | Frontend | Streamlit |
 | Language | Python 3.11+ |
 
 ---
 
-*Built by Rishikesh Rachamalla*
+<p align="center">Built by <strong>Rishikesh Rachamalla</strong></p>
