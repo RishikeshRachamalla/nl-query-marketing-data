@@ -27,8 +27,12 @@ st.markdown("""
 *, *::before, *::after { box-sizing: border-box; }
 html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
-/* ─── Base ─── */
-.stApp { background: #05050f; min-height: 100vh; }
+/* ─── Base — body holds the bg so orbs show through transparent stApp ─── */
+body { background: #05050f !important; }
+.stApp { background: transparent !important; min-height: 100vh; }
+/* Ensure main content blocks sit above the fixed orbs */
+[data-testid="stAppViewContainer"] { position: relative; z-index: 1; }
+[data-testid="stSidebar"] { position: relative; z-index: 2 !important; }
 
 /* ─── Keyframes ─── */
 @keyframes gradientShift {
@@ -291,10 +295,10 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
 /* ─── Buttons ─── */
 .stButton > button {
-    background: rgba(255,255,255,0.03) !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
+    background: rgba(99,102,241,0.06) !important;
+    border: 1px solid rgba(99,102,241,0.2) !important;
     border-radius: 100px !important;
-    color: #94a3b8 !important;
+    color: #a5b4fc !important;
     font-size: 0.8rem !important;
     font-weight: 500 !important;
     padding: 0.48rem 0.9rem !important;
@@ -304,11 +308,11 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     line-height: 1.35 !important;
 }
 .stButton > button:hover {
-    background: rgba(99,102,241,0.1) !important;
-    border-color: rgba(99,102,241,0.35) !important;
-    color: #c7d2fe !important;
+    background: rgba(99,102,241,0.15) !important;
+    border-color: rgba(99,102,241,0.45) !important;
+    color: #e0e7ff !important;
     transform: translateY(-2px) scale(1.02) !important;
-    box-shadow: 0 6px 24px rgba(99,102,241,0.15) !important;
+    box-shadow: 0 6px 24px rgba(99,102,241,0.2) !important;
 }
 .stButton > button:active {
     transform: translateY(0) scale(0.98) !important;
@@ -634,14 +638,14 @@ components.html("""
         '50%{transform:translate(28px,-40px);opacity:.65;}}';
     doc.head.appendChild(style);
 
-    /* orbs: indigo / cyan / emerald */
+    /* orbs: indigo / cyan / emerald — higher opacity so they punch through */
     var orbs = [
-        {id:'dp-orb-1', top:'-160px', left:'-160px',     w:'720px', h:'720px',
-         color:'rgba(99,102,241,0.16)',  anim:'dpF1 16s ease-in-out infinite'},
-        {id:'dp-orb-2', bottom:'-160px', right:'-160px', w:'600px', h:'600px',
-         color:'rgba(6,182,212,0.12)',   anim:'dpF2 20s ease-in-out infinite'},
-        {id:'dp-orb-3', top:'35%', right:'6%',            w:'380px', h:'380px',
-         color:'rgba(16,185,129,0.09)',  anim:'dpF3 26s ease-in-out infinite'},
+        {id:'dp-orb-1', top:'-120px', left:'-120px',     w:'800px', h:'800px',
+         color:'rgba(99,102,241,0.22)',  anim:'dpF1 16s ease-in-out infinite'},
+        {id:'dp-orb-2', bottom:'-120px', right:'-120px', w:'680px', h:'680px',
+         color:'rgba(6,182,212,0.17)',   anim:'dpF2 20s ease-in-out infinite'},
+        {id:'dp-orb-3', top:'32%', right:'4%',            w:'440px', h:'440px',
+         color:'rgba(16,185,129,0.13)',  anim:'dpF3 26s ease-in-out infinite'},
     ];
     orbs.forEach(function(o) {
         var d = doc.createElement('div');
