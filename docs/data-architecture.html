@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Data Play — Data Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 1280px; height: 720px;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  background: #05050f;
+  color: #e2e8f0;
+}
+
+/* ── Orbs ── */
+.orb {
+  position: fixed; border-radius: 50%;
+  filter: blur(90px); pointer-events: none; z-index: 0;
+}
+.orb-1 { width:650px; height:650px; top:-180px; left:-180px;
+  background: radial-gradient(circle, rgba(99,102,241,0.2), transparent 70%);
+  animation: oF1 16s ease-in-out infinite; }
+.orb-2 { width:550px; height:550px; bottom:-180px; right:-180px;
+  background: radial-gradient(circle, rgba(6,182,212,0.15), transparent 70%);
+  animation: oF2 20s ease-in-out infinite; }
+.orb-3 { width:380px; height:380px; top:30%; right:8%;
+  background: radial-gradient(circle, rgba(16,185,129,0.11), transparent 70%);
+  animation: oF3 24s ease-in-out infinite; }
+@keyframes oF1 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(40px,-45px);} }
+@keyframes oF2 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(-40px,40px);} }
+@keyframes oF3 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(20px,-25px);} }
+
+/* ── Keyframes ── */
+@keyframes gradShift {
+  0%{background-position:0% 50%;} 50%{background-position:100% 50%;} 100%{background-position:0% 50%;}
+}
+@keyframes fadeIn    { from{opacity:0;} to{opacity:1;} }
+@keyframes fadeInUp  { from{opacity:0;transform:translateY(18px);} to{opacity:1;transform:translateY(0);} }
+@keyframes fadeInDown{ from{opacity:0;transform:translateY(-14px);} to{opacity:1;transform:translateY(0);} }
+@keyframes scaleIn   { from{opacity:0;transform:scale(0.9);} to{opacity:1;transform:scale(1);} }
+@keyframes blink     { 0%,100%{opacity:1;} 50%{opacity:0;} }
+@keyframes dashMove  { to{stroke-dashoffset:-24;} }
+@keyframes shimmer   { 0%{left:-80%;} 100%{left:160%;} }
+@keyframes pulse     { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.04);opacity:0.85;} }
+@keyframes flowDot {
+  0%   { stroke-dashoffset: 100; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { stroke-dashoffset: 0;   opacity: 0; }
+}
+
+/* ── Wrapper ── */
+.wrapper {
+  position: relative; z-index: 1;
+  width: 1280px; height: 720px;
+  display: flex; flex-direction: column;
+  padding: 30px 44px 22px;
+}
+
+/* ── Top bar ── */
+.top-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 22px;
+  opacity: 0; animation: fadeInDown 0.6s ease 0.2s forwards;
+}
+.logo {
+  font-size: 1.3rem; font-weight: 900; letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #a5b4fc, #6366f1, #38bdf8, #06b6d4, #10b981);
+  background-size: 300% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  animation: gradShift 5s linear infinite;
+}
+.top-title {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #334155;
+}
+.badge {
+  display: flex; align-items: center; gap: 0.4rem;
+  background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 100px; padding: 0.28rem 0.85rem;
+  font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #818cf8;
+}
+.badge-dot {
+  width:5px; height:5px; background:#6366f1; border-radius:50%;
+  box-shadow:0 0 6px rgba(99,102,241,0.9); animation: blink 2s ease infinite;
+}
+
+/* ── Main layout ── */
+.main {
+  display: flex; align-items: center; gap: 0;
+  flex: 1;
+}
+
+/* ── Source column ── */
+.source-col {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px; width: 148px; flex-shrink: 0;
+  opacity: 0; animation: fadeInUp 0.7s ease 0.8s forwards;
+}
+.source-label {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #334155; margin-bottom: 6px;
+}
+.source-card {
+  width: 136px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px; padding: 16px 12px;
+  text-align: center; position: relative; overflow: hidden;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.source-card.active {
+  border-color: rgba(99,102,241,0.4);
+  box-shadow: 0 0 28px rgba(99,102,241,0.14);
+}
+.source-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, #6366f1, #818cf8);
+  border-radius: 2px 2px 0 0;
+  opacity: 0; transition: opacity 0.4s ease;
+}
+.source-card.active::before { opacity:1; }
+.source-icon { font-size: 2rem; margin-bottom: 8px; display: block; }
+.source-name { font-size: 0.75rem; font-weight: 700; color: #e2e8f0; margin-bottom: 4px; }
+.source-meta { font-size: 0.6rem; color: #475569; line-height: 1.4; }
+.source-badge {
+  display: inline-block; margin-top: 6px;
+  background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 4px; padding: 2px 7px;
+  font-size: 0.58rem; font-weight: 600; color: #a5b4fc;
+}
+
+/* ── SVG arrow connectors ── */
+.connector-svg {
+  flex-shrink: 0; overflow: visible;
+}
+
+/* ── Databricks box ── */
+.db-container {
+  flex: 1;
+  background: rgba(99,102,241,0.04);
+  border: 1.5px dashed rgba(99,102,241,0.2);
+  border-radius: 20px;
+  padding: 18px 20px 14px;
+  position: relative;
+  opacity: 0; animation: fadeIn 0.7s ease 1s forwards;
+  transition: border-color 0.4s ease;
+}
+.db-container.lit {
+  border-color: rgba(99,102,241,0.35);
+  background: rgba(99,102,241,0.06);
+}
+.db-container-label {
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 8px;
+}
+.db-label-text {
+  font-size: 0.62rem; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #334155;
+}
+.db-label-tag {
+  font-size: 0.58rem; font-weight: 600; letter-spacing: 0.06em;
+  background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.18);
+  border-radius: 4px; padding: 1px 6px; color: #818cf8;
+}
+
+/* ── Transform row (PySpark blocks) ── */
+.transform-row {
+  display: flex; align-items: center; justify-content: space-around;
+  margin-bottom: 14px;
+}
+.transform-block {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  opacity: 0; transition: opacity 0.4s ease, transform 0.4s ease;
+  transform: translateY(-8px);
+}
+.transform-block.show { opacity:1; transform: translateY(0); }
+.transform-box {
+  width: 52px; height: 42px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.72rem; font-weight: 500; color: #475569;
+  position: relative; overflow: hidden;
+  transition: border-color 0.4s ease, color 0.4s ease;
+}
+.transform-box.active-bronze {
+  border-color: rgba(99,102,241,0.45); color: #a5b4fc;
+  box-shadow: 0 0 16px rgba(99,102,241,0.12);
+}
+.transform-box.active-silver {
+  border-color: rgba(6,182,212,0.45); color: #a5f3fc;
+  box-shadow: 0 0 16px rgba(6,182,212,0.12);
+}
+.transform-box.active-gold {
+  border-color: rgba(16,185,129,0.45); color: #6ee7b7;
+  box-shadow: 0 0 16px rgba(16,185,129,0.12);
+}
+.transform-label {
+  font-size: 0.58rem; color: #334155; font-weight: 500; letter-spacing: 0.04em;
+}
+
+/* ── Layer row (cylinders) ── */
+.layer-row {
+  display: flex; align-items: flex-end; justify-content: space-around;
+  padding-bottom: 28px;
+}
+.layer-item {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease;
+  transform: translateY(12px);
+}
+.layer-item.show { opacity:1; transform: translateY(0); }
+
+/* Cylinder shape */
+.cylinder-wrap { position: relative; width: 110px; height: 90px; }
+.cyl-body {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 74px; border-radius: 0 0 8px 8px;
+  transition: all 0.4s ease;
+}
+.cyl-top {
+  position: absolute; top: 0; left: 0; right: 0; height: 24px;
+  border-radius: 50%; transition: all 0.4s ease;
+}
+.cyl-top-inner {
+  position: absolute; top: 4px; left: 6px; right: 6px; height: 16px;
+  border-radius: 50%; opacity: 0.4;
+}
+/* Bronze */
+.cyl-bronze .cyl-body  { background: linear-gradient(180deg, rgba(99,102,241,0.18), rgba(99,102,241,0.08)); border: 1px solid rgba(99,102,241,0.2); border-top: none; }
+.cyl-bronze .cyl-top   { background: rgba(99,102,241,0.25); border: 1px solid rgba(99,102,241,0.3); }
+.cyl-bronze .cyl-top-inner { background: rgba(165,180,252,0.3); }
+.cyl-bronze.active .cyl-body { background: linear-gradient(180deg, rgba(99,102,241,0.32), rgba(99,102,241,0.14)); border-color: rgba(99,102,241,0.45); box-shadow: 0 4px 20px rgba(99,102,241,0.15); }
+.cyl-bronze.active .cyl-top  { background: rgba(99,102,241,0.45); border-color: rgba(99,102,241,0.6); }
+/* Silver */
+.cyl-silver .cyl-body  { background: linear-gradient(180deg, rgba(6,182,212,0.18), rgba(6,182,212,0.08)); border: 1px solid rgba(6,182,212,0.2); border-top: none; }
+.cyl-silver .cyl-top   { background: rgba(6,182,212,0.25); border: 1px solid rgba(6,182,212,0.3); }
+.cyl-silver .cyl-top-inner { background: rgba(165,243,252,0.3); }
+.cyl-silver.active .cyl-body { background: linear-gradient(180deg, rgba(6,182,212,0.32), rgba(6,182,212,0.14)); border-color: rgba(6,182,212,0.45); box-shadow: 0 4px 20px rgba(6,182,212,0.15); }
+.cyl-silver.active .cyl-top  { background: rgba(6,182,212,0.45); border-color: rgba(6,182,212,0.6); }
+/* Gold */
+.cyl-gold .cyl-body  { background: linear-gradient(180deg, rgba(16,185,129,0.18), rgba(16,185,129,0.08)); border: 1px solid rgba(16,185,129,0.2); border-top: none; }
+.cyl-gold .cyl-top   { background: rgba(16,185,129,0.25); border: 1px solid rgba(16,185,129,0.3); }
+.cyl-gold .cyl-top-inner { background: rgba(110,231,183,0.3); }
+.cyl-gold.active .cyl-body { background: linear-gradient(180deg, rgba(16,185,129,0.32), rgba(16,185,129,0.14)); border-color: rgba(16,185,129,0.45); box-shadow: 0 4px 20px rgba(16,185,129,0.15); }
+.cyl-gold.active .cyl-top  { background: rgba(16,185,129,0.45); border-color: rgba(16,185,129,0.6); }
+
+.layer-name {
+  font-size: 0.72rem; font-weight: 700; color: #94a3b8; letter-spacing: 0.02em;
+}
+.layer-sub {
+  font-size: 0.58rem; color: #334155; text-align: center; line-height: 1.4;
+}
+/* Gold table pills */
+.gold-pills {
+  display: flex; flex-direction: column; gap: 2px; margin-top: 2px;
+  opacity: 0; transition: opacity 0.4s ease 0.3s;
+}
+.gold-pills.show { opacity:1; }
+.gold-pill {
+  font-size: 0.55rem; padding: 1px 6px; border-radius: 3px; font-weight: 600;
+  background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2);
+  color: #6ee7b7; text-align: center; white-space: nowrap;
+}
+
+/* ── Consumption column ── */
+.consume-col {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 12px; width: 160px; flex-shrink: 0;
+  opacity: 0;
+}
+.consume-col.show { animation: fadeInUp 0.6s ease forwards; }
+.consume-label {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #334155; margin-bottom: 2px;
+}
+.consume-card {
+  width: 148px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px; padding: 14px 12px;
+  text-align: center; position: relative; overflow: hidden;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.consume-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  border-radius: 2px 2px 0 0; opacity:0; transition: opacity 0.4s ease;
+}
+.consume-card.active-streamlit {
+  border-color: rgba(255,75,75,0.35);
+  box-shadow: 0 0 24px rgba(255,75,75,0.1);
+}
+.consume-card.active-streamlit::before {
+  background: linear-gradient(90deg, #ff4b4b, #ff8c8c); opacity:1;
+}
+.consume-card.active-claude {
+  border-color: rgba(99,102,241,0.4);
+  box-shadow: 0 0 24px rgba(99,102,241,0.12);
+}
+.consume-card.active-claude::before {
+  background: linear-gradient(90deg, #6366f1, #38bdf8, #10b981);
+  background-size: 200% auto; animation: gradShift 3s linear infinite; opacity:1;
+}
+.consume-icon { font-size: 1.6rem; margin-bottom: 6px; display:block; }
+.consume-name { font-size: 0.72rem; font-weight: 700; color: #e2e8f0; margin-bottom: 3px; }
+.consume-desc { font-size: 0.6rem; color: #475569; line-height: 1.4; }
+.consume-pulse {
+  display: inline-flex; align-items: center; gap: 3px;
+  margin-top: 5px; font-size: 0.58rem; color: #818cf8; font-weight: 500;
+}
+.consume-pulse-dot {
+  width:5px; height:5px; background:#6366f1; border-radius:50%;
+  box-shadow:0 0 6px rgba(99,102,241,0.8); animation: blink 2s ease infinite;
+}
+
+/* ── Bottom tech row ── */
+.tech-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 14px;
+  opacity: 0; animation: fadeIn 0.6s ease 1.2s forwards;
+}
+.tech-tags { display: flex; gap: 8px; align-items: center; }
+.tech-tag {
+  font-size: 0.58rem; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: #1e293b;
+  padding: 2px 8px; border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 4px;
+}
+.github {
+  font-size: 0.6rem; color: #1e293b; letter-spacing: 0.03em;
+}
+
+/* ── Vertical mini-arrow between transform and layer ── */
+.mini-arrow {
+  text-align: center; color: #1e293b; font-size: 0.7rem;
+  margin: -6px 0; line-height: 1;
+  opacity: 0; transition: opacity 0.3s ease;
+}
+.mini-arrow.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<div class="wrapper">
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="logo">Data Play</div>
+    <div class="top-title">Data Architecture — Medallion + AI Query Layer</div>
+    <div class="badge"><span class="badge-dot"></span>v1.0</div>
+  </div>
+
+  <!-- Main layout -->
+  <div class="main">
+
+    <!-- ── Source column ── -->
+    <div class="source-col">
+      <div class="source-label">Data Source</div>
+      <div class="source-card" id="src-card">
+        <span class="source-icon">📦</span>
+        <div class="source-name">UCI Online Retail II</div>
+        <div class="source-meta">Raw transactional<br/>data · CSV</div>
+        <div class="source-badge">525K rows</div>
+      </div>
+    </div>
+
+    <!-- Arrow: source → databricks -->
+    <svg class="connector-svg" width="52" height="80" viewBox="0 0 52 80">
+      <defs>
+        <marker id="ah-left" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#6366f1" opacity="0.7"/>
+        </marker>
+      </defs>
+      <line id="arr-left" x1="4" y1="40" x2="4" y2="40"
+        stroke="#6366f1" stroke-width="1.5" stroke-dasharray="4 3"
+        marker-end="url(#ah-left)" opacity="0.7"
+        style="transition: x2 0.6s ease;"/>
+      <circle id="flow-dot-left" cx="4" cy="40" r="3" fill="#6366f1" opacity="0"/>
+    </svg>
+
+    <!-- ── Databricks / Delta Lake box ── -->
+    <div class="db-container" id="db-box">
+
+      <!-- Transform row -->
+      <div class="transform-row">
+        <div class="transform-block" id="tb1">
+          <div class="transform-box" id="tbx1">&lt;/&gt;</div>
+          <div class="transform-label">Ingest</div>
+        </div>
+        <div style="color:#1e293b;font-size:0.8rem;margin-top:-10px;">→</div>
+        <div class="transform-block" id="tb2">
+          <div class="transform-box" id="tbx2">&lt;/&gt;</div>
+          <div class="transform-label">Transform</div>
+        </div>
+        <div style="color:#1e293b;font-size:0.8rem;margin-top:-10px;">→</div>
+        <div class="transform-block" id="tb3">
+          <div class="transform-box" id="tbx3">&lt;/&gt;</div>
+          <div class="transform-label">Aggregate</div>
+        </div>
+      </div>
+
+      <!-- Mini arrows pointing down -->
+      <div style="display:flex;justify-content:space-around;padding:0 30px;">
+        <div class="mini-arrow" id="ma1">↓</div>
+        <div class="mini-arrow" id="ma2">↓</div>
+        <div class="mini-arrow" id="ma3">↓</div>
+      </div>
+
+      <!-- Layer row (cylinders) -->
+      <div class="layer-row">
+
+        <!-- Bronze -->
+        <div class="layer-item" id="li-bronze">
+          <div class="cylinder-wrap">
+            <div class="cyl-top cyl-bronze" id="cyl-bronze-top">
+              <div class="cyl-top-inner"></div>
+            </div>
+            <div class="cyl-body cyl-bronze" id="cyl-bronze-body"></div>
+          </div>
+          <div class="layer-name" style="color:#a5b4fc;">Bronze</div>
+          <div class="layer-sub">Raw transactions<br/>DBFS · Delta</div>
+        </div>
+
+        <!-- Arrow between Bronze→Silver -->
+        <svg width="48" height="20" style="margin-bottom:55px;flex-shrink:0;">
+          <defs>
+            <marker id="ah-bs" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+              <path d="M0,0 L5,2.5 L0,5 Z" fill="#64748b" opacity="0.5"/>
+            </marker>
+          </defs>
+          <line id="arr-bs" x1="2" y1="10" x2="2" y2="10"
+            stroke="#64748b" stroke-width="1.5" stroke-dasharray="3 3"
+            marker-end="url(#ah-bs)" opacity="0.5"
+            style="transition: x2 0.5s ease;"/>
+        </svg>
+
+        <!-- Silver -->
+        <div class="layer-item" id="li-silver">
+          <div class="cylinder-wrap">
+            <div class="cyl-top cyl-silver" id="cyl-silver-top">
+              <div class="cyl-top-inner"></div>
+            </div>
+            <div class="cyl-body cyl-silver" id="cyl-silver-body"></div>
+          </div>
+          <div class="layer-name" style="color:#a5f3fc;">Silver</div>
+          <div class="layer-sub">Cleaned · RFM<br/>Loyalty scores</div>
+        </div>
+
+        <!-- Arrow Silver→Gold -->
+        <svg width="48" height="20" style="margin-bottom:55px;flex-shrink:0;">
+          <defs>
+            <marker id="ah-sg" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+              <path d="M0,0 L5,2.5 L0,5 Z" fill="#64748b" opacity="0.5"/>
+            </marker>
+          </defs>
+          <line id="arr-sg" x1="2" y1="10" x2="2" y2="10"
+            stroke="#64748b" stroke-width="1.5" stroke-dasharray="3 3"
+            marker-end="url(#ah-sg)" opacity="0.5"
+            style="transition: x2 0.5s ease;"/>
+        </svg>
+
+        <!-- Gold -->
+        <div class="layer-item" id="li-gold">
+          <div class="cylinder-wrap">
+            <div class="cyl-top cyl-gold" id="cyl-gold-top">
+              <div class="cyl-top-inner"></div>
+            </div>
+            <div class="cyl-body cyl-gold" id="cyl-gold-body"></div>
+          </div>
+          <div class="layer-name" style="color:#6ee7b7;">Gold</div>
+          <div class="layer-sub">Aggregated<br/>Business-ready</div>
+          <div class="gold-pills" id="gold-pills">
+            <div class="gold-pill">customer_360</div>
+            <div class="gold-pill">daily_kpis</div>
+            <div class="gold-pill">segment_summary</div>
+            <div class="gold-pill">campaign_metrics</div>
+          </div>
+        </div>
+
+      </div><!-- end layer-row -->
+
+      <!-- Container label -->
+      <div class="db-container-label">
+        <span class="db-label-text">Databricks</span>
+        <span class="db-label-tag">Delta Lake</span>
+        <span class="db-label-tag">PySpark</span>
+        <span class="db-label-tag">SQL Warehouse</span>
+      </div>
+
+    </div><!-- end db-container -->
+
+    <!-- Arrow: databricks → consumption -->
+    <svg class="connector-svg" width="52" height="160" viewBox="0 0 52 160">
+      <defs>
+        <marker id="ah-right" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#10b981" opacity="0.8"/>
+        </marker>
+      </defs>
+      <line id="arr-right" x1="4" y1="80" x2="4" y2="80"
+        stroke="#10b981" stroke-width="1.5" stroke-dasharray="4 3"
+        marker-end="url(#ah-right)" opacity="0.7"/>
+    </svg>
+
+    <!-- ── Consumption column ── -->
+    <div class="consume-col" id="consume-col">
+      <div class="consume-label">Query Layer</div>
+
+      <!-- Streamlit card -->
+      <div class="consume-card" id="card-streamlit">
+        <span class="consume-icon">🖥️</span>
+        <div class="consume-name">Streamlit App</div>
+        <div class="consume-desc">Natural language<br/>query interface</div>
+      </div>
+
+      <!-- Claude card -->
+      <div class="consume-card" id="card-claude">
+        <span class="consume-icon">✦</span>
+        <div class="consume-name">Claude API</div>
+        <div class="consume-desc">NL → SQL<br/>AI Insights</div>
+        <div class="consume-pulse">
+          <span class="consume-pulse-dot"></span>
+          haiku-4-5
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- end main -->
+
+  <!-- Tech row -->
+  <div class="tech-row">
+    <div class="tech-tags">
+      <span class="tech-tag">Databricks</span>
+      <span class="tech-tag">Delta Lake</span>
+      <span class="tech-tag">PySpark</span>
+      <span class="tech-tag">Claude API</span>
+      <span class="tech-tag">Streamlit</span>
+      <span class="tech-tag">Python 3.11</span>
+    </div>
+    <div class="github">github.com/RishikeshRachamalla/nl-query-marketing-data</div>
+  </div>
+
+</div><!-- end wrapper -->
+
+<script>
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+// Draw a horizontal SVG line smoothly
+function drawLine(lineEl, toX) {
+  lineEl.style.transition = 'x2 0.55s cubic-bezier(0.4,0,0.2,1)';
+  lineEl.setAttribute('x2', toX);
+}
+
+async function sequence() {
+
+  // 1 — Source card activates
+  await wait(200);
+  document.getElementById('src-card').classList.add('active');
+  await wait(700);
+
+  // 2 — Left arrow draws
+  const arrLeft = document.getElementById('arr-left');
+  arrLeft.style.transition = 'x2 0.6s ease';
+  arrLeft.setAttribute('x2', '46');
+  await wait(700);
+
+  // 3 — Databricks box lights up
+  document.getElementById('db-box').classList.add('lit');
+  await wait(400);
+
+  // 4 — Bronze transform + layer
+  document.getElementById('tb1').classList.add('show');
+  document.getElementById('tbx1').classList.add('active-bronze');
+  await wait(300);
+  document.getElementById('ma1').classList.add('show');
+  await wait(300);
+  document.getElementById('li-bronze').classList.add('show');
+  document.getElementById('cyl-bronze-top').closest('.cylinder-wrap').querySelector('.cyl-top').classList.add('active');
+  const bronzeItems = document.querySelectorAll('.cyl-bronze');
+  bronzeItems.forEach(el => el.classList.add('active'));
+  await wait(700);
+
+  // Bronze → Silver arrow
+  document.getElementById('arr-bs').style.transition = 'x2 0.45s ease';
+  document.getElementById('arr-bs').setAttribute('x2', '44');
+  await wait(500);
+
+  // 5 — Silver transform + layer
+  document.getElementById('tb2').classList.add('show');
+  document.getElementById('tbx2').classList.add('active-silver');
+  await wait(300);
+  document.getElementById('ma2').classList.add('show');
+  await wait(300);
+  document.getElementById('li-silver').classList.add('show');
+  document.querySelectorAll('.cyl-silver').forEach(el => el.classList.add('active'));
+  await wait(700);
+
+  // Silver → Gold arrow
+  document.getElementById('arr-sg').style.transition = 'x2 0.45s ease';
+  document.getElementById('arr-sg').setAttribute('x2', '44');
+  await wait(500);
+
+  // 6 — Gold transform + layer + pills
+  document.getElementById('tb3').classList.add('show');
+  document.getElementById('tbx3').classList.add('active-gold');
+  await wait(300);
+  document.getElementById('ma3').classList.add('show');
+  await wait(300);
+  document.getElementById('li-gold').classList.add('show');
+  document.querySelectorAll('.cyl-gold').forEach(el => el.classList.add('active'));
+  await wait(500);
+  document.getElementById('gold-pills').classList.add('show');
+  await wait(900);
+
+  // 7 — Right arrow draws
+  const arrRight = document.getElementById('arr-right');
+  arrRight.style.transition = 'x2 0.6s ease';
+  arrRight.setAttribute('x2', '46');
+  await wait(700);
+
+  // 8 — Consumption cards appear
+  const consumeCol = document.getElementById('consume-col');
+  consumeCol.classList.add('show');
+  await wait(300);
+  document.getElementById('card-streamlit').classList.add('active-streamlit');
+  await wait(400);
+  document.getElementById('card-claude').classList.add('active-claude');
+  await wait(3000);
+
+  // ── Reset ──
+  // Source
+  document.getElementById('src-card').classList.remove('active');
+  // Left arrow
+  arrLeft.style.transition = 'none';
+  arrLeft.setAttribute('x2', '4');
+  // DB box
+  document.getElementById('db-box').classList.remove('lit');
+  // Transforms
+  ['tb1','tb2','tb3'].forEach(id => document.getElementById(id).classList.remove('show'));
+  ['tbx1','tbx2','tbx3'].forEach((id,i) => {
+    document.getElementById(id).className = 'transform-box';
+  });
+  // Mini arrows
+  ['ma1','ma2','ma3'].forEach(id => document.getElementById(id).classList.remove('show'));
+  // Layers
+  ['li-bronze','li-silver','li-gold'].forEach(id => document.getElementById(id).classList.remove('show'));
+  document.querySelectorAll('.cyl-bronze,.cyl-silver,.cyl-gold').forEach(el => el.classList.remove('active'));
+  // Inner arrows
+  ['arr-bs','arr-sg'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.transition = 'none'; el.setAttribute('x2','2');
+  });
+  // Gold pills
+  document.getElementById('gold-pills').classList.remove('show');
+  // Right arrow
+  arrRight.style.transition = 'none'; arrRight.setAttribute('x2','4');
+  // Consumption
+  consumeCol.classList.remove('show');
+  consumeCol.style.opacity = '0';
+  document.getElementById('card-streamlit').className = 'consume-card';
+  document.getElementById('card-claude').className = 'consume-card';
+
+  await wait(600);
+  consumeCol.style.opacity = '';
+  sequence();
+}
+
+setTimeout(sequence, 1200);
+</script>
+</body>
+</html>
