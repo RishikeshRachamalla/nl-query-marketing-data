@@ -785,17 +785,16 @@ if not active_question:
     <div class="hero-wrap">
         <div class="hero-eyebrow">
             <span class="hero-eyebrow-dot"></span>
-            AI-Powered Marketing Analytics
+            AI-Powered Analytics
         </div>
         <div class="hero-title">Data Play</div>
         <div class="hero-subtitle">
-            Ask questions in plain English — Claude writes the SQL,
-            Databricks runs it, you see results instantly.
+            Natural-language analytics on top of Databricks.
         </div>
         <div class="hero-stats">
             <span class="stat-pill indigo">4 Gold Tables</span>
             <span class="stat-pill cyan">525K Transactions</span>
-            <span class="stat-pill emerald">Claude AI Insights</span>
+            <span class="stat-pill emerald">Contextual Insights</span>
         </div>
     </div>
     """, unsafe_allow_html=True)

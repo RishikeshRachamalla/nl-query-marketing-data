@@ -26,11 +26,11 @@ REQUIRED_ENV = {
 
 # ── Example prompts ───────────────────────────────────────────────────────────
 EXAMPLES = [
-    "Top 10 customers by total spend",
+    "Show the top 10 customers by total spend",
     "Which signup channel drives the most revenue?",
-    "Platinum customers with high churn risk",
-    "Email opt-in rate by age group",
-    "Compare avg basket size across loyalty tiers",
+    "Which Platinum customers have the highest churn risk?",
+    "Show email opt-in rate by age group",
+    "Which loyalty tier has the highest lifetime value?"
 ]
 
 # ── Number format map ─────────────────────────────────────────────────────────
